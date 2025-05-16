@@ -541,7 +541,7 @@ namespace MCP
 			m_deqAsyncTasks.push_back(spTask);
 
 			_lock.unlock();
-			m_cvAsyncThread.notify_one();  // 通知消费者
+			m_cvAsyncThread.notify_one();
 		}
 
 		return ERRNO_OK;
@@ -565,7 +565,7 @@ namespace MCP
 			m_vecCancelledTaskIds.push_back(requestId);
 
 			_lock.unlock();
-			m_cvAsyncThread.notify_one();  // 通知消费者
+			m_cvAsyncThread.notify_one();
 		}
 
 		return ERRNO_OK;
@@ -597,20 +597,30 @@ namespace MCP
 		{
 			std::unique_lock<std::mutex> _lock(m_mtxAsyncThread);
 
-			// 等待缓冲区不空
+			// Wait for tasks
 			m_cvAsyncThread.wait(
 				_lock, 
 				[this]() {
 				return !m_deqAsyncTasks.empty() || !m_vecCancelledTaskIds.empty() || !m_bRunAsyncTask;
 				});
 
-			if (!m_bRunAsyncTask && m_deqAsyncTasks.empty() && m_vecCancelledTaskIds.empty())
+			// Break the loop and clean up tasks
+			if (!m_bRunAsyncTask)
 			{
 				_lock.unlock();
+
+				std::for_each(m_vecAsyncTasksCache.begin(), m_vecAsyncTasksCache.end(), [this](auto& spTask)
+					{
+						if (spTask)
+						{
+							spTask->Cancel();
+						}
+					});
+
 				break;
 			}
 
-			// 消费数据
+			// Process new pending tasks
 			std::vector<std::shared_ptr<MCP::CMCPTask>> vecTasks;
 			while (!m_deqAsyncTasks.empty())
 			{
@@ -619,7 +629,7 @@ namespace MCP
 				m_deqAsyncTasks.pop_front();
 			}
 
-			// 取消任务
+			//  Process task cancellation requests
 			std::for_each(m_vecAsyncTasksCache.begin(), m_vecAsyncTasksCache.end(), [this](auto& spTask) 
 				{
 					if (spTask)
@@ -646,7 +656,7 @@ namespace MCP
 			m_vecCancelledTaskIds.clear();
 			_lock.unlock();
 
-			// 清理已完成的任务缓存
+			// Clean up completed tasks
 			m_vecAsyncTasksCache.erase(
 				std::remove_if(m_vecAsyncTasksCache.begin(), m_vecAsyncTasksCache.end(), [](auto spTask) 
 					{
@@ -658,7 +668,7 @@ namespace MCP
 					}),
 				m_vecAsyncTasksCache.end());
 
-			// 缓存新任务
+			// Cache new tasks
 			for (auto& spTask : vecTasks)
 			{
 				if (spTask)
