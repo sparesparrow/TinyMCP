@@ -84,17 +84,14 @@ func (s *Server) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 			mcp.MethodResourcesRead,
 			mcp.MethodPromptsList,
 			mcp.MethodPromptsGet:
-			status = http.StatusBadRequest
 			mcpRes = &mcpError{
 				Code: mcp.METHOD_NOT_FOUND,
 			}
 		case mcp.MethodPing:
-			status = http.StatusOK
 			mcpRes = &mcp.EmptyResult{}
 		case mcp.MethodInitialize:
 			var init mcp.InitializeRequest
 			if err := json.Unmarshal(body, &init); err != nil {
-				status = http.StatusBadRequest
 				mcpRes = &mcpError{
 					Code: mcp.INVALID_REQUEST,
 				}
@@ -102,7 +99,6 @@ func (s *Server) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 			}
 			mcpRes, err = s.handleInitialize(req.Context(), &init)
 			if err != nil {
-				status = http.StatusInternalServerError
 				mcpRes = &mcpError{
 					Code:    mcp.INTERNAL_ERROR,
 					Message: err.Error(),
@@ -111,7 +107,6 @@ func (s *Server) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		case mcp.MethodToolsList:
 			var list mcp.ListToolsRequest
 			if err := json.Unmarshal(body, &list); err != nil {
-				status = http.StatusBadRequest
 				mcpRes = &mcpError{
 					Code:    mcp.INVALID_REQUEST,
 					Message: err.Error(),
@@ -120,7 +115,6 @@ func (s *Server) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 			}
 			mcpRes, err = s.handleListTools(req.Context(), &list)
 			if err != nil {
-				status = http.StatusInternalServerError
 				mcpRes = &mcpError{
 					Code:    mcp.INTERNAL_ERROR,
 					Message: err.Error(),
@@ -129,7 +123,6 @@ func (s *Server) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		case mcp.MethodToolsCall:
 			var call mcp.CallToolRequest
 			if err := json.Unmarshal(body, &call); err != nil {
-				status = http.StatusBadRequest
 				mcpRes = &mcpError{
 					Code:    mcp.INVALID_REQUEST,
 					Message: err.Error(),
@@ -138,14 +131,12 @@ func (s *Server) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 			}
 			mcpRes, err = s.handleCallTool(req.Context(), &call)
 			if err != nil {
-				status = http.StatusInternalServerError
 				mcpRes = &mcpError{
 					Code:    mcp.INTERNAL_ERROR,
 					Message: err.Error(),
 				}
 			}
 		default:
-			status = http.StatusBadRequest
 			mcpRes = &mcpError{
 				Code:    mcp.METHOD_NOT_FOUND,
 				Message: "method not found",
