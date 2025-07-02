@@ -111,3 +111,13 @@ claude mcp add --transport http tinymcp http://localhost:8080 -H 'Authorization:
 > ![NOTE]
 > The `Authorization` header is supplied in this case to indicate to Claude Code
 > that it should not attempt to authenticate via the OAuth flow.
+
+#### Gemini CLI
+
+The [Gemini CLI](https://github.com/google-gemini/gemini-cli) is an open-source
+AI agent that allows you to access [Gemini](https://gemini.google.com) from the
+terminal.
+
+The [`.gemini/settings.json`](./.gemini/settings.json) file in this repository
+will automatically configure the CLI to connect to a locally running `tinymcp`
+MCP server if the CLI is started in this repository.
