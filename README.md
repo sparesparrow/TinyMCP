@@ -105,5 +105,9 @@ With the `tinymcp` MCP server running locally, it can be [added to Claude
 Code](https://docs.anthropic.com/en/docs/claude-code/mcp) with a single command.
 
 ```
-claude mcp add --transport http tinymcp http://localhost:8080
+claude mcp add --transport http tinymcp http://localhost:8080 -H 'Authorization: Bearer none'
 ```
+
+> ![NOTE]
+> The `Authorization` header is supplied in this case to indicate to Claude Code
+> that it should not attempt to authenticate via the OAuth flow.
