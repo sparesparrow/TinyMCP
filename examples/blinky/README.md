@@ -15,8 +15,9 @@ via the `tinymcp` MCP sever.
 ## Building & Flashing
 
 While adding support for any hardware should be relatively straightforward,
-building for the [nRF9160]() is currently supported without any additional
-configuration. Use the following command to build the `blinky` firmware.
+building for the [nRF9160](https://www.nordicsemi.com/Products/nRF9160) is
+currently supported without any additional configuration. Use the following
+command to build the `blinky` firmware.
 
 ```
 west build -p -b nrf9160dk/nrf9160/ns
