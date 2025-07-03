@@ -69,8 +69,8 @@ TINYMCP_DEVICE=<your-golioth-device-id>
 TINYMCP_API_KEY=<api-key-for-your-golioth-project>
 ```
 
-The server can be built into an executable using `go build ./server` or run
-directly with `go run ./server`.
+The server can be built into an executable using `go build -o tinymcp ./server`
+or run directly with `go run ./server`.
 
 If you don't already have a device on Golioth, the [blinky
 example](./examples/blinky) demonstrates how to expose LED control to an LLM via
@@ -108,7 +108,7 @@ Code](https://docs.anthropic.com/en/docs/claude-code/mcp) with a single command.
 claude mcp add --transport http tinymcp http://localhost:8080 -H 'Authorization: Bearer none'
 ```
 
-> ![NOTE]
+> [!NOTE]
 > The `Authorization` header is supplied in this case to indicate to Claude Code
 > that it should not attempt to authenticate via the OAuth flow.
 
