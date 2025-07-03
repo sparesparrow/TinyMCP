@@ -5,6 +5,8 @@ Protocol](https://modelcontextprotocol.io/).
 
 > [!WARNING]
 > `tinymcp` is an experimental project. Expect frequent breaking changes.
+> Extreme caution should be taken when delegating physical capabilities to AI
+> systems.
 
 ## Background
 
