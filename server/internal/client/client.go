@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -59,6 +58,9 @@ func (c *Client) ListTools(ctx context.Context) ([]mcp.Tool, error) {
 	if err != nil {
 		return nil, err
 	}
+	if res.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("unexpected response (%d): %s", res.StatusCode, b)
+	}
 	var tools toolsRes
 	if err := json.Unmarshal(b, &tools); err != nil {
 		return nil, err
@@ -94,11 +96,12 @@ func (c *Client) CallTool(ctx context.Context, name string) error {
 		return err
 	}
 	defer res.Body.Close()
-	if _, err := io.ReadAll(res.Body); err != nil {
+	b, err := io.ReadAll(res.Body)
+	if err != nil {
 		return err
 	}
 	if res.StatusCode != http.StatusOK {
-		return errors.New("failed RPC")
+		return fmt.Errorf("unexpected response (%d): %s", res.StatusCode, b)
 	}
 	return nil
 }
