@@ -89,6 +89,57 @@ namespace MCP
 		int DoDeserialize(const Json::Value& jMsg) override;
 	};
 
+	struct ListResourcesResult : public MCP::Response
+	{
+	public:
+		ListResourcesResult(bool bNeedIdentity)
+			: Response(MessageType_ListResourcesResult, bNeedIdentity)
+		{
+
+		}
+
+		std::vector<MCP::EmbeddedResource> vecResources;
+		std::string strNextCursor;
+
+		bool IsValid() const override { return true; }
+		int DoSerialize(Json::Value& jMsg) const override;
+		int DoDeserialize(const Json::Value& jMsg) override { return Response::DoDeserialize(jMsg); }
+	};
+
+	struct ReadResourceResult : public MCP::Response
+	{
+	public:
+		ReadResourceResult(bool bNeedIdentity)
+			: Response(MessageType_ReadResourceResult, bNeedIdentity)
+		{
+
+		}
+
+		std::vector<MCP::TextResourceContents> vecTextContents;
+		std::vector<MCP::BlobResourceContents> vecBlobContents;
+
+		bool IsValid() const override { return true; }
+		int DoSerialize(Json::Value& jMsg) const override;
+		int DoDeserialize(const Json::Value& jMsg) override { return Response::DoDeserialize(jMsg); }
+	};
+
+	struct ListPromptsResult : public MCP::Response
+	{
+	public:
+		ListPromptsResult(bool bNeedIdentity)
+			: Response(MessageType_ListPromptsResult, bNeedIdentity)
+		{
+
+		}
+
+		std::vector<MCP::TextContent> vecPrompts;
+		std::string strNextCursor;
+
+		bool IsValid() const override { return true; }
+		int DoSerialize(Json::Value& jMsg) const override;
+		int DoDeserialize(const Json::Value& jMsg) override { return Response::DoDeserialize(jMsg); }
+	};
+
 	struct CallToolResult : public MCP::Response
 	{
 	public:

@@ -76,6 +76,45 @@ namespace MCP
 		int Execute() override;
 	};
 
+	class ProcessListResourcesRequest : public ProcessRequest
+	{
+	public:
+		ProcessListResourcesRequest(const std::shared_ptr<MCP::Request>& spRequest)
+			: ProcessRequest(spRequest)
+		{
+
+		}
+
+		std::shared_ptr<CMCPTask> Clone() const override;
+		int Execute() override;
+	};
+
+	class ProcessReadResourceRequest : public ProcessRequest
+	{
+	public:
+		ProcessReadResourceRequest(const std::shared_ptr<MCP::Request>& spRequest)
+			: ProcessRequest(spRequest)
+		{
+
+		}
+
+		std::shared_ptr<CMCPTask> Clone() const override;
+		int Execute() override;
+	};
+
+	class ProcessListPromptsRequest : public ProcessRequest
+	{
+	public:
+		ProcessListPromptsRequest(const std::shared_ptr<MCP::Request>& spRequest)
+			: ProcessRequest(spRequest)
+		{
+
+		}
+
+		std::shared_ptr<CMCPTask> Clone() const override;
+		int Execute() override;
+	};
+
 	class ProcessCallToolRequest : public ProcessRequest
 	{
 	public:

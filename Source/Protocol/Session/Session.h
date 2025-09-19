@@ -62,6 +62,8 @@ namespace MCP
 		int ParseNotification(const std::string& strMsg, std::shared_ptr<MCP::Message>& spMsg);
 		int ProcessMessage(int iErrCode, const std::shared_ptr<MCP::Message>& spMsg);
 		int ProcessRequest(int iErrCode, const std::shared_ptr<MCP::Message>& spMsg);
+		// Authorization hook: return ERRNO_OK if allowed, otherwise ERRNO_UNAUTHORIZED/ERRNO_FORBIDDEN
+		int AuthorizeRequest(const std::shared_ptr<MCP::Request>& spRequest) const;
 		int ProcessResponse(int iErrCode, const std::shared_ptr<MCP::Message>& spMsg);
 		int ProcessNotification(int iErrCode, const std::shared_ptr<MCP::Message>& spMsg);
 		int SwitchState(SessionState eState);

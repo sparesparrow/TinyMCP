@@ -62,6 +62,9 @@ namespace MCP
 	static constexpr const char* METHOD_PING = "ping";
 	static constexpr const char* METHOD_TOOLS_LIST = "tools/list";
 	static constexpr const char* METHOD_TOOLS_CALL = "tools/call";
+	static constexpr const char* METHOD_RESOURCES_LIST = "resources/list";
+	static constexpr const char* METHOD_RESOURCES_READ = "resources/read";
+	static constexpr const char* METHOD_PROMPTS_LIST = "prompts/list";
 
 	static constexpr const char* CONST_TEXT = "text";
 	static constexpr const char* CONST_IMAGE = "image";
@@ -90,6 +93,10 @@ namespace MCP
 	static constexpr const int ERRNO_INTERNAL_INPUT_ERROR = -32004;
 	static constexpr const int ERRNO_INTERNAL_OUTPUT_ERROR = -32005;
 	static constexpr const int ERRNO_SERVER_ERROR_LAST = -32099;
+
+	// Authorization related (server-defined)
+	static constexpr const int ERRNO_UNAUTHORIZED = -32010; // not authenticated
+	static constexpr const int ERRNO_FORBIDDEN = -32011;    // authenticated but not allowed
 
 	enum DataType
 	{
@@ -121,6 +128,12 @@ namespace MCP
 		MessageType_Tools,
 		MessageType_PingRequest,
 		MessageType_PingResult,
+		MessageType_ListResourcesRequest,
+		MessageType_ListResourcesResult,
+		MessageType_ReadResourceRequest,
+		MessageType_ReadResourceResult,
+		MessageType_ListPromptsRequest,
+		MessageType_ListPromptsResult,
 		MessageType_ListToolsRequest,
 		MessageType_ListToolsResult,
 		MessageType_Tool,

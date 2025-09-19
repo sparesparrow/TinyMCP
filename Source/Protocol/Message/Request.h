@@ -73,6 +73,54 @@ namespace MCP
 		int DoDeserialize(const Json::Value& jMsg) override;
 	};
 
+	struct ListResourcesRequest : public MCP::Request
+	{
+	public:
+		ListResourcesRequest(bool bNeedIdentity)
+			: Request(MessageType_ListResourcesRequest, bNeedIdentity)
+		{
+
+		}
+
+		std::string strCursor;
+
+		bool IsValid() const override;
+		int DoSerialize(Json::Value& jMsg) const override;
+		int DoDeserialize(const Json::Value& jMsg) override;
+	};
+
+	struct ReadResourceRequest : public MCP::Request
+	{
+	public:
+		ReadResourceRequest(bool bNeedIdentity)
+			: Request(MessageType_ReadResourceRequest, bNeedIdentity)
+		{
+
+		}
+
+		std::string strUri;
+
+		bool IsValid() const override;
+		int DoSerialize(Json::Value& jMsg) const override;
+		int DoDeserialize(const Json::Value& jMsg) override;
+	};
+
+	struct ListPromptsRequest : public MCP::Request
+	{
+	public:
+		ListPromptsRequest(bool bNeedIdentity)
+			: Request(MessageType_ListPromptsRequest, bNeedIdentity)
+		{
+
+		}
+
+		std::string strCursor;
+
+		bool IsValid() const override;
+		int DoSerialize(Json::Value& jMsg) const override;
+		int DoDeserialize(const Json::Value& jMsg) override;
+	};
+
 	struct CallToolRequest : public MCP::Request
 	{
 	public:

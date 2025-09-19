@@ -1,0 +1,497 @@
+namespace mcp;
+
+// Enums
+enum MessageType: byte {
+  Request = 0,
+  Response = 1,
+  Notification = 2
+}
+
+enum Role: byte {
+  User = 0,
+  Assistant = 1,
+  System = 2
+}
+
+enum ToolCallStatus: byte {
+  Pending = 0,
+  InProgress = 1,
+  Completed = 2,
+  Failed = 3
+}
+
+enum ResourceType: byte {
+  Text = 0,
+  Image = 1,
+  Audio = 2,
+  Video = 3,
+  Blob = 4
+}
+
+// Core message structures
+table Annotations {
+  audience: [Role];
+  lastModified: string;
+  priority: int;
+}
+
+table Error {
+  code: int;
+  message: string;
+  data: string; // JSON string for additional error data
+}
+
+table Ping {
+  id: string;
+}
+
+table Pong {
+  id: string;
+}
+
+// Request/Response/Notification base structures
+table Request {
+  jsonrpc: string;
+  id: string;
+  method: string;
+  params: string; // JSON string for parameters
+}
+
+table Response {
+  jsonrpc: string;
+  id: string;
+  result: string; // JSON string for result data
+  error: Error;
+}
+
+table Notification {
+  jsonrpc: string;
+  method: string;
+  params: string; // JSON string for parameters
+}
+
+// Message union
+union Message {
+  Request,
+  Response,
+  Notification
+}
+
+// Tool-related interfaces
+table Tool {
+  name: string;
+  description: string;
+  inputSchema: string; // JSON schema string
+}
+
+table ToolCall {
+  name: string;
+  arguments: string; // JSON string for arguments
+  result: string; // JSON string for result
+  isError: bool;
+  error: Error;
+}
+
+
+// Content types
+table TextContent {
+  type: string; // "text"
+  text: string;
+}
+
+table ImageContent {
+  type: string; // "image"
+  data: string; // base64 encoded image data
+  mimeType: string;
+}
+
+table AudioContent {
+  type: string; // "audio"
+  data: string; // base64 encoded audio data
+  mimeType: string;
+}
+
+table VideoContent {
+  type: string; // "video"
+  data: string; // base64 encoded video data
+  mimeType: string;
+}
+
+table BlobContent {
+  type: string; // "blob"
+  data: string; // base64 encoded blob data
+  mimeType: string;
+  blobId: string;
+}
+
+// Content union
+union Content {
+  TextContent,
+  ImageContent,
+  AudioContent,
+  VideoContent,
+  BlobContent
+}
+
+table ToolResult {
+  content: [Content];
+  isError: bool;
+  error: Error;
+}
+
+// Resource-related interfaces
+table Resource {
+  uri: string;
+  name: string;
+  description: string;
+  mimeType: string;
+}
+
+table ResourceContents {
+  uri: string;
+  mimeType: string;
+  text: string;
+  blob: string; // base64 encoded blob data
+}
+
+table BlobResourceContents {
+  blobId: string;
+  mimeType: string;
+  data: string; // base64 encoded data
+}
+
+// Prompt-related interfaces
+table PromptArgument {
+  name: string;
+  description: string;
+  required: bool;
+}
+
+table Prompt {
+  name: string;
+  description: string;
+  arguments: [PromptArgument];
+}
+
+// Session-related interfaces
+table Session {
+  sessionId: string;
+  clientId: string;
+  capabilities: string; // JSON string for client capabilities
+  metadata: string; // JSON string for additional metadata
+}
+
+// Transport-related interfaces
+table TransportConfig {
+  type: string; // "stdio", "sse", "websocket", etc.
+  config: string; // JSON string for transport-specific configuration
+}
+
+// Server capabilities
+table ServerCapabilities {
+  tools: [Tool];
+  resources: [Resource];
+  prompts: [Prompt];
+  logging: bool;
+}
+
+// Client capabilities
+table ClientCapabilities {
+  experimental: string; // JSON string for experimental features
+  sampling: string; // JSON string for sampling configuration
+}
+
+// Initialize request/response
+table InitializeRequest {
+  protocolVersion: string;
+  capabilities: ClientCapabilities;
+  clientInfo: string; // JSON string for client information
+}
+
+table InitializeResponse {
+  protocolVersion: string;
+  capabilities: ServerCapabilities;
+  serverInfo: string; // JSON string for server information
+}
+
+// -----------------------------------------------------------------------------
+// Additional MCP Schema Types (stubs aligned to MCP spec names)
+
+// Logging
+enum LoggingLevel: byte {
+  DEBUG,
+  INFO,
+  NOTICE,
+  WARNING,
+  ERROR,
+  CRITICAL,
+  ALERT,
+  EMERGENCY
+}
+
+// Primitive schema descriptors (lightweight, for validation metadata)
+table PrimitiveSchemaDefinition {
+  title: string;
+  description: string;
+}
+
+table BooleanSchema {
+  def: PrimitiveSchemaDefinition;
+  default: bool;
+}
+
+table NumberSchema {
+  def: PrimitiveSchemaDefinition;
+  default: double;
+  minimum: double;
+  maximum: double;
+}
+
+table StringSchema {
+  def: PrimitiveSchemaDefinition;
+  default: string;
+  enumValues: [string];
+}
+
+table EnumSchema {
+  values: [string];
+}
+
+// Common identifiers
+table ProgressToken { token: string; }
+table RequestId { id: string; }
+
+// Misc common types
+table Cursor { from: uint; to: uint; }
+table ModelHint { name: string; }
+table ModelPreferences {
+  costPriority: float;
+  intelligencePriority: float;
+  speedPriority: float;
+  hints: [ModelHint];
+}
+
+// Result wrappers
+table Result { data: string; }
+table EmptyResult { empty: bool; }
+
+// JSON-RPC compatible shapes
+table JSONRPCError {
+  code: int;
+  message: string;
+  data: string;
+}
+
+table JSONRPCRequest {
+  jsonrpc: string;
+  id: string;
+  method: string;
+  params: string;
+}
+
+table JSONRPCResponse {
+  jsonrpc: string;
+  id: string;
+  result: string;
+  error: JSONRPCError;
+}
+
+table JSONRPCNotification {
+  jsonrpc: string;
+  method: string;
+  params: string;
+}
+
+// Content/Prompting
+table ContentBlock {
+  content: Content;
+}
+
+table PromptMessage {
+  role: Role;
+  content: [Content];
+}
+
+table SamplingMessage {
+  role: Role;
+  content: [Content];
+}
+
+table PromptReference { name: string; }
+
+// Resources
+table ResourceLink { uri: string; name: string; }
+table EmbeddedResource { uri: string; name: string; mimeType: string; }
+
+table ResourceTemplate {
+  uriTemplate: string;
+  name: string;
+  mimeType: string;
+}
+
+table ResourceTemplateReference { uriTemplate: string; }
+
+table TextResourceContents {
+  uri: string;
+  mimeType: string;
+  text: string;
+}
+
+// Capabilities
+table ToolAnnotations { annotations: Annotations; }
+
+// Implementation
+table Implementation { name: string; version: string; }
+
+// Requests / Results (endpoints)
+// completion/complete
+table CompleteRequest {
+  id: string;
+  messages: [SamplingMessage];
+  preferences: ModelPreferences;
+}
+
+table CompleteResult { content: [Content]; }
+
+// elicitation/create
+table ElicitRequest {
+  id: string;
+  cursor: Cursor;
+}
+
+table ElicitResult { content: [Content]; }
+
+// initialize
+table InitializeResult {
+  protocolVersion: string;
+  capabilities: ServerCapabilities;
+  serverInfo: string;
+}
+
+// logging/setLevel
+table SetLevelRequest { level: LoggingLevel; }
+
+// ping
+table PingRequest { id: string; }
+
+// prompts/get
+table GetPromptRequest { name: string; }
+table GetPromptResult { prompt: Prompt; }
+
+// prompts/list
+table ListPromptsRequest { dummy: bool; }
+table ListPromptsResult { prompts: [Prompt]; }
+
+// resources/list
+table ListResourcesRequest { dummy: bool; }
+table ListResourcesResult { resources: [Resource]; }
+
+// resources/read
+table ReadResourceRequest { uri: string; }
+table ReadResourceResult { contents: [ResourceContents]; }
+
+// resources/subscribe
+table SubscribeRequest { uri: string; }
+
+// resources/templates/list
+table ListResourceTemplatesRequest { dummy: bool; }
+table ListResourceTemplatesResult { templates: [ResourceTemplate]; }
+
+// resources/unsubscribe
+table UnsubscribeRequest { uri: string; }
+
+// roots/list
+table RootEntry { uri: string; name: string; }
+table ListRootsRequest { dummy: bool; }
+table ListRootsResult { roots: [RootEntry]; }
+
+// sampling/createMessage
+table CreateMessageRequest { messages: [SamplingMessage]; }
+table CreateMessageResult { message: SamplingMessage; }
+
+// tools/call
+table CallToolRequest { name: string; arguments: string; }
+table CallToolResult {
+  content: [Content];
+  isError: bool;
+  error: JSONRPCError;
+}
+
+// tools/list
+table ListToolsRequest { dummy: bool; }
+table ListToolsResult { tools: [Tool]; }
+
+// Notifications
+table CancelledNotification { progressToken: string; }
+table InitializedNotification { dummy: bool; }
+table LoggingMessageNotification { level: LoggingLevel; message: string; }
+table ProgressNotification { progressToken: string; value: float; }
+table PromptListChangedNotification { dummy: bool; }
+table ResourceListChangedNotification { dummy: bool; }
+table ResourceUpdatedNotification { uri: string; }
+table RootsListChangedNotification { dummy: bool; }
+table ToolListChangedNotification { dummy: bool; }
+
+// Root envelope
+union RootMessage {
+  // JSON-RPC base
+  JSONRPCRequest,
+  JSONRPCResponse,
+  JSONRPCNotification,
+  // initialize
+  InitializeRequest,
+  InitializeResponse,
+  InitializeResult,
+  // ping
+  Ping,
+  Pong,
+  PingRequest,
+  // completion
+  CompleteRequest,
+  CompleteResult,
+  // elicitation
+  ElicitRequest,
+  ElicitResult,
+  // prompts
+  GetPromptRequest,
+  GetPromptResult,
+  ListPromptsRequest,
+  ListPromptsResult,
+  // resources
+  ListResourcesRequest,
+  ListResourcesResult,
+  ReadResourceRequest,
+  ReadResourceResult,
+  SubscribeRequest,
+  UnsubscribeRequest,
+  ListResourceTemplatesRequest,
+  ListResourceTemplatesResult,
+  ResourceUpdatedNotification,
+  // roots
+  ListRootsRequest,
+  ListRootsResult,
+  // sampling
+  CreateMessageRequest,
+  CreateMessageResult,
+  // tools
+  CallToolRequest,
+  CallToolResult,
+  ListToolsRequest,
+  ListToolsResult,
+  ToolListChangedNotification,
+  // logging
+  SetLevelRequest,
+  LoggingMessageNotification,
+  // generic notifications
+  CancelledNotification,
+  InitializedNotification,
+  ProgressNotification,
+  PromptListChangedNotification,
+  ResourceListChangedNotification,
+  RootsListChangedNotification
+}
+
+table Root { message: RootMessage; }
+
+// Set Root as default
+root_type Root;

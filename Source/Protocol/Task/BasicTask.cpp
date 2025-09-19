@@ -263,6 +263,113 @@ namespace MCP
 		return m_bFinished;
 	}
 
+	////////////////////////////////////////////////////////////////////////////////////////
+	// ProcessListResourcesRequest
+	std::shared_ptr<CMCPTask> ProcessListResourcesRequest::Clone() const
+	{
+		return nullptr;
+	}
+
+	int ProcessListResourcesRequest::Execute()
+	{
+		if (!IsValid())
+			return ERRNO_INTERNAL_ERROR;
+
+		auto spListRequest = std::dynamic_pointer_cast<ListResourcesRequest>(m_spRequest);
+		if (!spListRequest)
+			return ERRNO_INTERNAL_ERROR;
+
+		auto spResult = std::make_shared<ListResourcesResult>(true);
+		if (!spResult)
+			return ERRNO_INTERNAL_ERROR;
+		spResult->requestId = spListRequest->requestId;
+		// minimal empty list
+		std::string strResponse;
+		if (ERRNO_OK != spResult->Serialize(strResponse))
+			return ERRNO_INTERNAL_ERROR;
+		auto spTransport = CMCPSession::GetInstance().GetTransport();
+		if (!spTransport)
+			return ERRNO_INTERNAL_ERROR;
+		if (ERRNO_OK != spTransport->Write(strResponse))
+			return ERRNO_INTERNAL_ERROR;
+
+		return ERRNO_OK;
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////
+	// ProcessReadResourceRequest
+	std::shared_ptr<CMCPTask> ProcessReadResourceRequest::Clone() const
+	{
+		return nullptr;
+	}
+
+	int ProcessReadResourceRequest::Execute()
+	{
+		if (!IsValid())
+			return ERRNO_INTERNAL_ERROR;
+
+		auto spReadRequest = std::dynamic_pointer_cast<ReadResourceRequest>(m_spRequest);
+		if (!spReadRequest)
+			return ERRNO_INTERNAL_ERROR;
+
+		auto spResult = std::make_shared<ReadResourceResult>(true);
+		if (!spResult)
+			return ERRNO_INTERNAL_ERROR;
+		spResult->requestId = spReadRequest->requestId;
+
+		// For now, return a simple text resource based on URI
+		// In a real implementation, this would read from file system, database, etc.
+		MCP::TextResourceContents textContent;
+		textContent.strUri = spReadRequest->strUri;
+		textContent.strMimeType = "text/plain";
+		textContent.strText = "Resource content for: " + spReadRequest->strUri;
+		spResult->vecTextContents.push_back(textContent);
+
+		std::string strResponse;
+		if (ERRNO_OK != spResult->Serialize(strResponse))
+			return ERRNO_INTERNAL_ERROR;
+		auto spTransport = CMCPSession::GetInstance().GetTransport();
+		if (!spTransport)
+			return ERRNO_INTERNAL_ERROR;
+		if (ERRNO_OK != spTransport->Write(strResponse))
+			return ERRNO_INTERNAL_ERROR;
+
+		return ERRNO_OK;
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////
+	// ProcessListPromptsRequest
+	std::shared_ptr<CMCPTask> ProcessListPromptsRequest::Clone() const
+	{
+		return nullptr;
+	}
+
+	int ProcessListPromptsRequest::Execute()
+	{
+		if (!IsValid())
+			return ERRNO_INTERNAL_ERROR;
+
+		auto spListRequest = std::dynamic_pointer_cast<ListPromptsRequest>(m_spRequest);
+		if (!spListRequest)
+			return ERRNO_INTERNAL_ERROR;
+
+		auto spResult = std::make_shared<ListPromptsResult>(true);
+		if (!spResult)
+			return ERRNO_INTERNAL_ERROR;
+		spResult->requestId = spListRequest->requestId;
+		// minimal empty list
+		std::string strResponse;
+		if (ERRNO_OK != spResult->Serialize(strResponse))
+			return ERRNO_INTERNAL_ERROR;
+		auto spTransport = CMCPSession::GetInstance().GetTransport();
+		if (!spTransport)
+			return ERRNO_INTERNAL_ERROR;
+		if (ERRNO_OK != spTransport->Write(strResponse))
+			return ERRNO_INTERNAL_ERROR;
+
+		return ERRNO_OK;
+	}
+
 	bool ProcessCallToolRequest::IsCancelled() const
 	{
 		return m_bCancelled;

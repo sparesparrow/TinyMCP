@@ -15,6 +15,12 @@ namespace Implementation
         MCP::Tools tools;
         RegisterServerToolsCapabilities(tools);
 
+        // Register resource capabilities
+        MCP::Resources resources;
+        resources.bListChanged = false;
+        resources.bSubscribe = false;
+        RegisterServerResourcesCapabilities(resources);
+
         // 3. Register the descriptions of the Server's actual capabilities and their calling methods.
         MCP::Tool tool;
         tool.strName = Implementation::CEchoTask::TOOL_NAME;

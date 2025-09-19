@@ -191,6 +191,86 @@ namespace MCP
 		return Response::DoSerialize(jMsg);
 	}
 
+	////////////////////////////////////////////////////////////////////////////////////////
+	// ListResourcesResult
+	int ListResourcesResult::DoSerialize(Json::Value& jMsg) const
+	{
+		Json::Value jResult(Json::objectValue);
+
+		Json::Value jResources(Json::arrayValue);
+		for (auto& embedded : vecResources)
+		{
+			Json::Value jEmbedded(Json::objectValue);
+			if (ERRNO_OK == embedded.DoSerialize(jEmbedded))
+				jResources.append(jEmbedded);
+		}
+		jResult[MSG_KEY_RESOURCES] = jResources;
+
+		if (!strNextCursor.empty())
+		{
+			Json::Value jNextCursor(strNextCursor);
+			jResult[MSG_KEY_NEXT_CURSOR] = jNextCursor;
+		}
+
+		jMsg[MSG_KEY_RESULT] = jResult;
+		return Response::DoSerialize(jMsg);
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////
+	// ReadResourceResult
+	int ReadResourceResult::DoSerialize(Json::Value& jMsg) const
+	{
+		Json::Value jResult(Json::objectValue);
+
+		Json::Value jContents(Json::arrayValue);
+		
+		// Add text contents
+		for (auto& textContent : vecTextContents)
+		{
+			Json::Value jTextContent(Json::objectValue);
+			if (ERRNO_OK == textContent.DoSerialize(jTextContent))
+				jContents.append(jTextContent);
+		}
+		
+		// Add blob contents
+		for (auto& blobContent : vecBlobContents)
+		{
+			Json::Value jBlobContent(Json::objectValue);
+			if (ERRNO_OK == blobContent.DoSerialize(jBlobContent))
+				jContents.append(jBlobContent);
+		}
+		
+		jResult[MSG_KEY_CONTENT] = jContents;
+
+		jMsg[MSG_KEY_RESULT] = jResult;
+		return Response::DoSerialize(jMsg);
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////
+	// ListPromptsResult
+	int ListPromptsResult::DoSerialize(Json::Value& jMsg) const
+	{
+		Json::Value jResult(Json::objectValue);
+
+		Json::Value jPrompts(Json::arrayValue);
+		for (auto& text : vecPrompts)
+		{
+			Json::Value jText(Json::objectValue);
+			if (ERRNO_OK == text.DoSerialize(jText))
+				jPrompts.append(jText);
+		}
+		jResult[MSG_KEY_PROMPTS] = jPrompts;
+
+		if (!strNextCursor.empty())
+		{
+			Json::Value jNextCursor(strNextCursor);
+			jResult[MSG_KEY_NEXT_CURSOR] = jNextCursor;
+		}
+
+		jMsg[MSG_KEY_RESULT] = jResult;
+		return Response::DoSerialize(jMsg);
+	}
+
 	int CallToolResult::DoDeserialize(const Json::Value& jMsg)
 	{
 		return Response::DoDeserialize(jMsg);

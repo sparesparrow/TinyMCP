@@ -365,3 +365,9 @@ FodyWeavers.xsd
 *.ui
 *.exp
 
+Example/MCPServer/Build/**/build/
+Example/MCPServer/Build/**/build*/
+
+
+Example/MCPClient/Build/**/build/
+Example/MCPClient/Build/**/build*/

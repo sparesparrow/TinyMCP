@@ -4,10 +4,19 @@
 #include <atomic>
 #include <signal.h>
 #include "EchoServer.h"
+#include "../../Source/Protocol/Public/Config.h"
 
 
 int LaunchEchoServer()
 {
+    // 0. Load configuration
+    auto& config = MCP::Config::GetInstance();
+    int configErr = config.LoadFromFile("config.ini");
+    if (MCP::ERRNO_OK != configErr)
+    {
+        std::cout << "Warning: Could not load config.ini, using defaults" << std::endl;
+    }
+
     // 1. Configure the Server.
     auto& server = Implementation::CEchoServer::GetInstance();
     int iErrCode = server.Initialize();

@@ -1,5 +1,6 @@
 #include "Session.h"
 #include "../Public/PublicDef.h"
+#include "../Public/Config.h"
 #include "../Message/BasicMessage.h"
 #include "../Message/Notification.h"
 #include "../Message/Request.h"
@@ -120,7 +121,14 @@ namespace MCP
 			iErrCode = ERRNO_INTERNAL_ERROR;
 			goto PROC_END;
 		}
-		m_hashMessage[MessageCategory_Request].push_back(spMsg);
+    m_hashMessage[MessageCategory_Request].push_back(spMsg);
+
+    // Authorization check (placeholder, always OK for now)
+    iErrCode = AuthorizeRequest(spRequest);
+    if (ERRNO_OK != iErrCode)
+    {
+        goto PROC_END;
+    }
 
 		switch (spRequest->eMessageType)
 		{
@@ -158,6 +166,42 @@ namespace MCP
 				}
 
 				auto spTask = std::make_shared<ProcessListToolsRequest>(spRequest);
+				if (!spTask)
+				{
+					iErrCode = ERRNO_INTERNAL_ERROR;
+					goto PROC_END;
+				}
+
+				iErrCode = spTask->Execute();
+
+			} break;
+			case MessageType_ListResourcesRequest:
+			{
+				auto spTask = std::make_shared<ProcessListResourcesRequest>(spRequest);
+				if (!spTask)
+				{
+					iErrCode = ERRNO_INTERNAL_ERROR;
+					goto PROC_END;
+				}
+
+				iErrCode = spTask->Execute();
+
+			} break;
+			case MessageType_ReadResourceRequest:
+			{
+				auto spTask = std::make_shared<ProcessReadResourceRequest>(spRequest);
+				if (!spTask)
+				{
+					iErrCode = ERRNO_INTERNAL_ERROR;
+					goto PROC_END;
+				}
+
+				iErrCode = spTask->Execute();
+
+			} break;
+			case MessageType_ListPromptsRequest:
+			{
+				auto spTask = std::make_shared<ProcessListPromptsRequest>(spRequest);
 				if (!spTask)
 				{
 					iErrCode = ERRNO_INTERNAL_ERROR;
@@ -397,6 +441,18 @@ namespace MCP
 		}
 		else if (spRequest->strMethod.compare(METHOD_TOOLS_CALL) == 0)
 		{
+			auto spCallToolRequest = std::make_shared<MCP::CallToolRequest>(true);
+			if (!spCallToolRequest)
+				return ERRNO_PARSE_ERROR;
+
+			iErrCode = spCallToolRequest->Deserialize(strMsg);
+			if (ERRNO_OK != iErrCode)
+				return ERRNO_INVALID_REQUEST;
+
+			spMsg = spCallToolRequest;
+
+			return ERRNO_OK;
+		}
 		else if (spRequest->strMethod.compare(METHOD_PING) == 0)
 		{
 			auto spPingRequest = std::make_shared<MCP::PingRequest>(true);
@@ -411,15 +467,45 @@ namespace MCP
 
 			return ERRNO_OK;
 		}
-			auto spCallToolRequest = std::make_shared<MCP::CallToolRequest>(true);
-			if (!spCallToolRequest)
+		else if (spRequest->strMethod.compare(METHOD_RESOURCES_LIST) == 0)
+		{
+			auto spListResourcesRequest = std::make_shared<MCP::ListResourcesRequest>(true);
+			if (!spListResourcesRequest)
 				return ERRNO_PARSE_ERROR;
 
-			iErrCode = spCallToolRequest->Deserialize(strMsg);
+			iErrCode = spListResourcesRequest->Deserialize(strMsg);
 			if (ERRNO_OK != iErrCode)
 				return ERRNO_INVALID_REQUEST;
 
-			spMsg = spCallToolRequest;
+			spMsg = spListResourcesRequest;
+
+			return ERRNO_OK;
+		}
+		else if (spRequest->strMethod.compare(METHOD_RESOURCES_READ) == 0)
+		{
+			auto spReadResourceRequest = std::make_shared<MCP::ReadResourceRequest>(true);
+			if (!spReadResourceRequest)
+				return ERRNO_PARSE_ERROR;
+
+			iErrCode = spReadResourceRequest->Deserialize(strMsg);
+			if (ERRNO_OK != iErrCode)
+				return ERRNO_INVALID_REQUEST;
+
+			spMsg = spReadResourceRequest;
+
+			return ERRNO_OK;
+		}
+		else if (spRequest->strMethod.compare(METHOD_PROMPTS_LIST) == 0)
+		{
+			auto spListPromptsRequest = std::make_shared<MCP::ListPromptsRequest>(true);
+			if (!spListPromptsRequest)
+				return ERRNO_PARSE_ERROR;
+
+			iErrCode = spListPromptsRequest->Deserialize(strMsg);
+			if (ERRNO_OK != iErrCode)
+				return ERRNO_INVALID_REQUEST;
+
+			spMsg = spListPromptsRequest;
 
 			return ERRNO_OK;
 		}
@@ -724,4 +810,34 @@ namespace MCP
 
 		return ERRNO_OK;
 	}
+}
+
+namespace MCP
+{
+    int CMCPSession::AuthorizeRequest(const std::shared_ptr<MCP::Request>& spRequest) const
+    {
+        // Load configuration
+        auto& config = Config::GetInstance();
+        
+        // If auth is disabled, allow all requests
+        if (!config.IsAuthEnabled())
+        {
+            return ERRNO_OK;
+        }
+
+        // In a real implementation, this would check:
+        // 1. API key from request headers
+        // 2. JWT tokens
+        // 3. OAuth2 tokens
+        // 4. Other authentication mechanisms
+        
+        // For now, we'll do a simple API key check
+        // In a real implementation, you'd extract the API key from the transport layer
+        // and compare it with the configured API key
+        
+        // Placeholder: always allow for now
+        // TODO: Implement proper authentication check
+        (void)spRequest;
+        return ERRNO_OK;
+    }
 }
