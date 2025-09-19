@@ -146,3 +146,55 @@ namespace MCP
 		return progressToken.IsValid();
 	}
 }
+
+namespace MCP
+{
+    // LogNotification
+    int LogNotification::DoSerialize(Json::Value& jMsg) const
+    {
+        int iErrCode = Notification::DoSerialize(jMsg);
+        if (ERRNO_OK != iErrCode)
+            return iErrCode;
+
+        Json::Value jParams(Json::objectValue);
+        if (!strLevel.empty())
+        {
+            Json::Value jLevel(strLevel);
+            jParams[MSG_KEY_LEVEL] = jLevel;
+        }
+        if (!strText.empty())
+        {
+            Json::Value jMessage(strText);
+            jParams[MSG_KEY_MESSAGE] = jMessage;
+        }
+        jMsg[MSG_KEY_PARAMS] = jParams;
+
+        return ERRNO_OK;
+    }
+
+    int LogNotification::DoDeserialize(const Json::Value& jMsg)
+    {
+        int iErrCode = Notification::DoDeserialize(jMsg);
+        if (ERRNO_OK != iErrCode)
+            return iErrCode;
+
+        if (jMsg.isMember(MSG_KEY_PARAMS) && jMsg[MSG_KEY_PARAMS].isObject())
+        {
+            auto& jParams = jMsg[MSG_KEY_PARAMS];
+            if (jParams.isMember(MSG_KEY_LEVEL) && jParams[MSG_KEY_LEVEL].isString())
+                strLevel = jParams[MSG_KEY_LEVEL].asString();
+            if (jParams.isMember(MSG_KEY_MESSAGE) && jParams[MSG_KEY_MESSAGE].isString())
+                strText = jParams[MSG_KEY_MESSAGE].asString();
+        }
+        return ERRNO_OK;
+    }
+
+    bool LogNotification::IsValid() const
+    {
+        if (!Notification::IsValid())
+            return false;
+        if (strMethod.compare(METHOD_NOTIFICATION_LOG) != 0)
+            return false;
+        return !strText.empty();
+    }
+}

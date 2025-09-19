@@ -1,6 +1,6 @@
 #pragma once
-// 为保证较好的跨平台特性，MCP命名空间的代码均使用标准c++编码
-// 非必要情况下，禁止使用特定系统平台API
+// To ensure good cross-platform compatibility, the MCP namespace code uses standard C++ only.
+// Avoid using platform-specific system APIs unless absolutely necessary.
 
 #include <json/json.h>
 #include "BasicMessage.h"
@@ -56,6 +56,20 @@ namespace MCP
 		bool IsValid() const override;
 		int DoSerialize(Json::Value& jMsg) const override;
 		int DoDeserialize(const Json::Value& jMsg) override;
+	};
+
+	struct PingResult : public MCP::Response
+	{
+	public:
+		PingResult(bool bNeedIdentity)
+			: Response(MessageType_PingResult, bNeedIdentity)
+		{
+
+		}
+
+		bool IsValid() const override { return Response::IsValid(); }
+		int DoSerialize(Json::Value& jMsg) const override { return Response::DoSerialize(jMsg); }
+		int DoDeserialize(const Json::Value& jMsg) override { return Response::DoDeserialize(jMsg); }
 	};
 
 	struct ListToolsResult : public MCP::Response

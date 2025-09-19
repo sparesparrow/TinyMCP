@@ -147,6 +147,28 @@ namespace MCP
 
 	////////////////////////////////////////////////////////////////////////////////////////
 	// CallToolRequest
+    // PingRequest
+    int PingRequest::DoSerialize(Json::Value& jMsg) const
+    {
+        return Request::DoSerialize(jMsg);
+    }
+
+    int PingRequest::DoDeserialize(const Json::Value& jMsg)
+    {
+        int iErrCode = Request::DoDeserialize(jMsg);
+        if (ERRNO_OK != iErrCode)
+            return iErrCode;
+        return ERRNO_OK;
+    }
+
+    bool PingRequest::IsValid() const
+    {
+        if (!Request::IsValid())
+            return false;
+        if (strMethod.compare(METHOD_PING) != 0)
+            return false;
+        return true;
+    }
 	int CallToolRequest::DoSerialize(Json::Value& jMsg) const
 	{
 		return Request::DoSerialize(jMsg);

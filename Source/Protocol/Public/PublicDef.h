@@ -1,6 +1,6 @@
 #pragma once
-// 为保证较好的跨平台特性，MCP命名空间的代码均使用标准c++编码
-// 非必要情况下，禁止使用特定系统平台API
+// To ensure good cross-platform compatibility, the MCP namespace code uses standard C++ only.
+// Avoid using platform-specific system APIs unless absolutely necessary.
 
 #include <string>
 #include <chrono>
@@ -8,7 +8,8 @@
 
 namespace MCP
 {
-	static constexpr const char* PROTOCOL_VER = "2024-11-05";
+	// MCP protocol version implemented by this SDK (updated to latest spec)
+	static constexpr const char* PROTOCOL_VER = "2025-06-18";
 	static constexpr const char* JSON_RPC_VER = "2.0";
 
 	static constexpr const char* MSG_KEY_JSONRPC = "jsonrpc";
@@ -19,6 +20,7 @@ namespace MCP
 	static constexpr const char* MSG_KEY_ERROR = "error";
 	static constexpr const char* MSG_KEY_CODE = "code";
 	static constexpr const char* MSG_KEY_MESSAGE = "message";
+	static constexpr const char* MSG_KEY_LEVEL = "level";
 	static constexpr const char* MSG_KEY_DATA = "data";
 	static constexpr const char* MSG_KEY_PROTOCOL_VERSION = "protocolVersion";	
 	static constexpr const char* MSG_KEY_CLIENT_INFO = "clientInfo";
@@ -55,6 +57,9 @@ namespace MCP
 	static constexpr const char* METHOD_NOTIFICATION_INITIALIZED = "notifications/initialized";
 	static constexpr const char* METHOD_NOTIFICATION_CANCELLED = "notifications/cancelled";
 	static constexpr const char* METHOD_NOTIFICATION_PROGRESS = "notifications/progress";
+	// Optional utilities (placeholders for future expansion per 2025-06-18 spec)
+	static constexpr const char* METHOD_NOTIFICATION_LOG = "notifications/log";
+	static constexpr const char* METHOD_PING = "ping";
 	static constexpr const char* METHOD_TOOLS_LIST = "tools/list";
 	static constexpr const char* METHOD_TOOLS_CALL = "tools/call";
 
@@ -69,7 +74,7 @@ namespace MCP
 	static constexpr const char* ERROR_MESSAGE_INTERNAL_ERROR = u8"internal error";
 
 
-	// json rpc 2.0标准错误码
+	// JSON-RPC 2.0 standard error codes
 	static constexpr const int ERRNO_OK = 0;
 	static constexpr const int ERRNO_PARSE_ERROR = -32700;
 	static constexpr const int ERRNO_INVALID_REQUEST = -32600;
@@ -77,7 +82,7 @@ namespace MCP
 	static constexpr const int ERRNO_INVALID_PARAMS = -32602;
 	static constexpr const int ERRNO_INTERNAL_ERROR = -32603;
 
-	// server自定义错误码
+	// Server-defined error code range
 	static constexpr const int ERRNO_SERVER_ERROR_FIRST = -32000;
 	static constexpr const int ERRNO_INVALID_RESPONSE = -32001;
 	static constexpr const int ERRNO_INVALID_NOTIFICATION = -32002;
@@ -114,6 +119,8 @@ namespace MCP
 		MessageType_Prompts,
 		MessageType_Resources,
 		MessageType_Tools,
+		MessageType_PingRequest,
+		MessageType_PingResult,
 		MessageType_ListToolsRequest,
 		MessageType_ListToolsResult,
 		MessageType_Tool,
@@ -128,5 +135,6 @@ namespace MCP
 		MessageType_ProgressToken,
 		MessageType_ProgressNotification,
 		MessageType_ErrorResponse,
+		MessageType_Notification_Log,
 	};
 }

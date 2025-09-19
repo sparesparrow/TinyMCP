@@ -1,6 +1,6 @@
 #pragma once
-// 为保证较好的跨平台特性，MCP命名空间的代码均使用标准c++编码
-// 非必要情况下，禁止使用特定系统平台API
+// To ensure good cross-platform compatibility, the MCP namespace code uses standard C++ only.
+// Avoid using platform-specific system APIs unless absolutely necessary.
 
 #include <json/json.h>
 #include "BasicMessage.h"
@@ -63,6 +63,25 @@ namespace MCP
 		MCP::ProgressToken progressToken;
 		int iProgress{ -1 };
 		int iTotal{ -1 };
+
+		bool IsValid() const override;
+		int DoSerialize(Json::Value& jMsg) const override;
+		int DoDeserialize(const Json::Value& jMsg) override;
+	};
+
+	// Structured log notification (utility in 2025-06-18 spec). This is optional for hosts.
+	struct LogNotification : public MCP::Notification
+	{
+	public:
+		LogNotification(bool bNeedIdentity)
+			: Notification(MessageType_Notification_Log, bNeedIdentity)
+		{
+
+		}
+
+		// minimal fields: level and message
+		std::string strLevel;
+		std::string strText;
 
 		bool IsValid() const override;
 		int DoSerialize(Json::Value& jMsg) const override;

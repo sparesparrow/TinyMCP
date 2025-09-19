@@ -204,6 +204,33 @@ namespace MCP
 				iErrCode = CommitAsyncTask(spNewProcessCallToolRequest);
 
 			} break;
+			case MessageType_PingRequest:
+			{
+				if (CMCPSession::SessionState_Initialized != CMCPSession::GetInstance().GetSessionState())
+				{
+					iErrCode = ERRNO_INVALID_REQUEST;
+					goto PROC_END;
+				}
+
+				auto spPing = std::make_shared<MCP::PingResult>(true);
+				if (!spPing)
+				{
+					iErrCode = ERRNO_INTERNAL_ERROR;
+					goto PROC_END;
+				}
+				spPing->requestId = spRequest->requestId;
+				{
+					std::string strResponse;
+					if (ERRNO_OK != spPing->Serialize(strResponse))
+						return ERRNO_INTERNAL_ERROR;
+					auto spTransport = CMCPSession::GetInstance().GetTransport();
+					if (!spTransport)
+						return ERRNO_INTERNAL_ERROR;
+					if (ERRNO_OK != spTransport->Write(strResponse))
+						return ERRNO_INTERNAL_ERROR;
+				}
+
+			} break;
 			default: break;
 		}
 
@@ -370,6 +397,20 @@ namespace MCP
 		}
 		else if (spRequest->strMethod.compare(METHOD_TOOLS_CALL) == 0)
 		{
+		else if (spRequest->strMethod.compare(METHOD_PING) == 0)
+		{
+			auto spPingRequest = std::make_shared<MCP::PingRequest>(true);
+			if (!spPingRequest)
+				return ERRNO_PARSE_ERROR;
+
+			iErrCode = spPingRequest->Deserialize(strMsg);
+			if (ERRNO_OK != iErrCode)
+				return ERRNO_INVALID_REQUEST;
+
+			spMsg = spPingRequest;
+
+			return ERRNO_OK;
+		}
 			auto spCallToolRequest = std::make_shared<MCP::CallToolRequest>(true);
 			if (!spCallToolRequest)
 				return ERRNO_PARSE_ERROR;
