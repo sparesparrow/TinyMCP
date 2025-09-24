@@ -1,2 +1,0 @@
-/usr/bin/ar qc libmcp_sdk.a CMakeFiles/mcp_sdk.dir/src/core/types_simple.cpp.o CMakeFiles/mcp_sdk.dir/src/core/error_simple.cpp.o CMakeFiles/mcp_sdk.dir/src/utils/logger_simple.cpp.o CMakeFiles/mcp_sdk.dir/src/utils/thread_pool_simple.cpp.o
-/usr/bin/ranlib libmcp_sdk.a
