@@ -1,0 +1,1 @@
+/usr/bin/c++ -O3 -DNDEBUG -Xlinker --dependency-file=CMakeFiles/mcp_tests.dir/link.d CMakeFiles/mcp_tests.dir/tests/test_simple.cpp.o -o mcp_tests  libmcp_sdk.a
