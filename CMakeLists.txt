@@ -47,8 +47,11 @@ target_compile_definitions(TinyMCP PRIVATE ${JSONCPP_CFLAGS_OTHER})
 add_executable(download_cli src/Examples/DownloadCLI.cpp)
 target_link_libraries(download_cli TinyMCP)
 
+add_executable(mcp_manager_cli src/Examples/MCPServerManagerCLI.cpp)
+target_link_libraries(mcp_manager_cli TinyMCP)
+
 # Install targets
-install(TARGETS TinyMCP download_cli
+install(TARGETS TinyMCP download_cli mcp_manager_cli
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
     RUNTIME DESTINATION bin
