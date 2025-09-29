@@ -1,4 +1,4 @@
-﻿# TinyMCP
+# TinyMCP
 
 ## What is TinyMCP?
 TinyMCP is a lightweight C++ SDK for implementing the MCP Server.
@@ -54,3 +54,23 @@ Please check the [wiki](https://github.com/Qihoo360/TinyMCP/wiki) for more infor
 
 ## LICENSE
 TinyMCP is licensed under the MIT License - see the LICENSE file for details.
+
+## Build with Conan
+
+```bash
+conan profile detect --force
+conan install . -of build --build=missing
+conan build . -bf build
+```
+
+## Package and Install
+
+```bash
+conan create . --name tinymcp --version 0.1.0 -s build_type=Release --build=missing
+```
+
+## CMake options
+
+- `TINYMCP_BUILD_SHARED` (OFF): build shared library
+- `TINYMCP_BUILD_TESTS` (ON): enable tests (`ctest`)
+- `TINYMCP_BUILD_EXAMPLES` (OFF): build example apps

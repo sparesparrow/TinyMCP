@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Conan
+        run: pip install conan==2.*
+      - name: Conan profile detect
+        run: conan profile detect --force
+      - name: Configure & Build
+        run: |
+          conan install . -of build -s build_type=Release --build=missing
+          conan build . -bf build
+      - name: Package
+        run: conan create . --version=0.1.0 --name=tinymcp -s build_type=Release --build=missing
+
+  build-macos:
+    runs-on: macos-13
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Conan
+        run: pip install conan==2.*
+      - name: Conan profile detect
+        run: conan profile detect --force
+      - name: Configure & Build
+        run: |
+          conan install . -of build -s build_type=Release --build=missing
+          conan build . -bf build
+
+  build-windows:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Conan
+        run: pip install conan==2.*
+      - name: Conan profile detect
+        run: conan profile detect --force
+      - name: Configure & Build
+        run: |
+          conan install . -of build -s build_type=Release --build=missing
+          conan build . -bf build
+
