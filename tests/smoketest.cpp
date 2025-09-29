@@ -1,5 +1,5 @@
 #include <iostream>
-#include "Source/Protocol/Public/PublicDef.h"
+#include "Public/PublicDef.h"
 
 int main() {
     // Minimal link-time check: ensure we can include a header and link lib

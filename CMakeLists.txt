@@ -30,8 +30,10 @@ endif()
 
 target_include_directories(tinymcp
     PUBLIC
-        ${CMAKE_SOURCE_DIR}/Source/Protocol
-        ${CMAKE_SOURCE_DIR}/Source/External/jsoncpp/include
+        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/Source/Protocol>
+        $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/Source/External/jsoncpp/include>
+        $<INSTALL_INTERFACE:include/tinymcp>
+        $<INSTALL_INTERFACE:include>
 )
 
 if(TINYMCP_ENABLE_WARNINGS)
