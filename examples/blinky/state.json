@@ -1,0 +1,14 @@
+{
+    "mcp": {
+        "tools": {
+            "schema": [
+                {
+                    "name": "light_on"
+                },
+                {
+                    "name": "light_off"
+                }
+            ]
+        }
+    }
+}
