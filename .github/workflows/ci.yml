@@ -11,6 +11,10 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
+      - name: Setup CMake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '3.27.x'
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -23,7 +27,7 @@ jobs:
         run: |
           conan install . -of build -s build_type=Release --build=missing
           conan build . -of build
-          ctest --test-dir build --output-on-failure
+          ctest --test-dir build --output-on-failure -C Release
       - name: Package
         run: conan create . --version=0.1.0 --name=tinymcp -s build_type=Release --build=missing
 
@@ -31,6 +35,10 @@ jobs:
     runs-on: macos-13
     steps:
       - uses: actions/checkout@v4
+      - name: Setup CMake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '3.27.x'
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -43,12 +51,16 @@ jobs:
         run: |
           conan install . -of build -s build_type=Release --build=missing
           conan build . -of build
-          ctest --test-dir build --output-on-failure
+          ctest --test-dir build --output-on-failure -C Release
 
   build-windows:
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v4
+      - name: Setup CMake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: '3.27.x'
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -61,5 +73,5 @@ jobs:
         run: |
           conan install . -of build -s build_type=Release --build=missing
           conan build . -of build
-          ctest --test-dir build --output-on-failure
+          ctest --test-dir build --output-on-failure -C Release
 
