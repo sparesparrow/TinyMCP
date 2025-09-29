@@ -1,0 +1,45 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  package-and-upload:
+    runs-on: ubuntu-22.04
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Conan
+        run: pip install conan==2.*
+      - name: Conan profile detect
+        run: conan profile detect --force
+      - name: Create package
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          conan create . --name=tinymcp --version="${VERSION}" -s build_type=Release --build=missing
+          conan export-pkg . --name=tinymcp --version="${VERSION}" -s build_type=Release -f -pf pkg
+      - name: Archive artifacts
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          mkdir -p dist
+          tar -C pkg -czf dist/tinymcp-${VERSION}-linux-x86_64.tar.gz .
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Upload to S3
+        env:
+          S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          aws s3 cp dist/tinymcp-${VERSION}-linux-x86_64.tar.gz s3://${S3_BUCKET}/tinymcp/${VERSION}/
+
