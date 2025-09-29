@@ -22,7 +22,8 @@ jobs:
       - name: Configure & Build
         run: |
           conan install . -of build -s build_type=Release --build=missing
-          conan build . -bf build
+          conan build . -of build
+          ctest --test-dir build --output-on-failure
       - name: Package
         run: conan create . --version=0.1.0 --name=tinymcp -s build_type=Release --build=missing
 
@@ -41,7 +42,8 @@ jobs:
       - name: Configure & Build
         run: |
           conan install . -of build -s build_type=Release --build=missing
-          conan build . -bf build
+          conan build . -of build
+          ctest --test-dir build --output-on-failure
 
   build-windows:
     runs-on: windows-2022
@@ -58,5 +60,6 @@ jobs:
       - name: Configure & Build
         run: |
           conan install . -of build -s build_type=Release --build=missing
-          conan build . -bf build
+          conan build . -of build
+          ctest --test-dir build --output-on-failure
 
